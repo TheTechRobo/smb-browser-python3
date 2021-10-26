@@ -1,0 +1,7 @@
+Package: smb-browser-python3
+Version: 1.0.0
+Architecture: all
+Depends: python3-gi
+Maintainer: TheTechRobo
+Description: Rewrite of smb-browser for Python 3 + PyGObject
+Conflicts: smb-browser

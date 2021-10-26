@@ -1,0 +1,16 @@
+#!/bin/sh
+# https://stackoverflow.com/a/49449380/9654083
+set -e
+
+deb_package='smb-browser-python3'
+python_package='/usr/share/smb-browser-python3'
+
+if which pyclean >/dev/null 2>&1; then
+    py3clean -p $deb_package
+else
+    dpkg -L $deb_package | grep ${python_package}$ | while read file
+    do
+        find ${file} -type d -name __pycache__ -exec rm -r {} \+
+    done
+fi
+

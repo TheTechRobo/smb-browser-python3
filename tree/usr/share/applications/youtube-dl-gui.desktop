@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.2.1
+Type=Application
+Name=Download YouTube videos
+Comment=Minimal stdeb example
+# myscript should wait for user input at the end, else the terminal
+# window will disappear immediately.
+Exec=youtube-dl-gui
+#Icon=/usr/share/icons/gnome/48x48/apps/file-manager.png
+Categories=Utility;
+# desktop should run this in a terminal application
+Terminal=false
+#StartupNotify=true
+#StartupWMClass=myscript
