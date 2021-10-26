@@ -1,25 +1,14 @@
-# youtube-dl-gui
-A small GUI frontend for youtube-dl designed for Elive Linux
+# smb-browser-python3
 
-# Requirements
-This has only been tested on Debian/Elive Linux, and will NEVER work on Windows unless there is  some major refactoring or you use Git Bash.
+Designed and tested on Elive.
 
-You will need the following package  `mpg321` and also `python3-tk`. 
-
-# Credits
-## Code
-See inside of source code, there's stuff scattered around.
-## Song
-Pandemic by CHRISRGMFB  
-https://chrisrgmfb.com  
-Promoted by Royalty Free Planet: https://royaltyfreeplanet.com  
-Creative Commons Attribution 3.0
+GTK+ app (PyGObject) that allows you to mount Samba shares.
 
 # Instructions
 There's three ways
 
 ## Installing the .deb (debian)
-Go to this link. https://github.com/TheTechRobo/youtube-dl-gui/releases. Install the deb file.
+Go to this link. https://github.com/TheTechRobo/smb-browser-python3/releases. Install the deb file.
 
 ## Building a .deb file from source
 ```zsh
@@ -27,6 +16,10 @@ make deb
 cd build
 sudo apt install ./youtube-dl-gui.deb
 ```
+If on an old version of Debian, you may need to replace `apt` with `apt-get` - try that if `apt` returns "command not found".
+
 
 ## Manual
-Copy the files inside `usr` into your `/usr/` folder. Making sure it doesn't overwrite anything.
+Copy the files inside `tree/usr` into your `/usr/` folder. Making sure it doesn't overwrite anything.
+
+I'd really appreciate build instructions for other distros!
