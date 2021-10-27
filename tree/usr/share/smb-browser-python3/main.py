@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import gi
+import gi,subprocess
 
 class EmptyClass: pass
 
@@ -64,6 +64,9 @@ class MyWindow(Gtk.Window):
         self.quit = Gtk.Button(label="Quit")
         self.quit.connect("clicked", self.destroyy)
         self.box.pack_end(self.quit, True, True, 0)
+        self.GetServerButon = Gtk.Button(label="DEBUG")
+        self.GetServerButon.connect("clicked",self._getServers)
+        self.box.pack_end(self.GetServerButon, True, True, 0)
     def destroyy(self, *args): self.destroy()
     def mntform(self, idkwhatthisvariableis):
         dialog = DialogExample(self)
@@ -95,6 +98,16 @@ class MyWindow(Gtk.Window):
         dialog.run()
 
         dialog.destroy()
+    def _getServers(self, parent):
+        sambaServerList = subprocess.run(["nmblookup __SAMBA__"], shell=True, capture_output=True).stdout.decode()
+        print(sambaServerList)
+        servers = []
+        for line in sambaServerList.split("\n"):
+            lne = line.split(" ")[0]
+            if lne == "\n" or lne == "": continue
+            print(lne)
+            servers.append((lne, subprocess.run(["nbtscan -e %s" % lne], shell=True, capture_output=True).stdout.decode().replace("\n","").split("\t")[1]))
+        print(servers)
 
 
 win = MyWindow()
