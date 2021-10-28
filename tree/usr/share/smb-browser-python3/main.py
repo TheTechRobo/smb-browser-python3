@@ -52,11 +52,13 @@ class MyWindow(Gtk.Window):
         self.Tabs = EmptyClass()
         self.Widgets = EmptyClass()
         # NOW WE'RE ACTUALLY DOING SHIT
-        self.Tabs.tab2 = Gtk.Box()
+        self.Tabs.tab2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.Widgets.setmountform = Gtk.Button(label="Read only or read-write?")
+        self.Widgets.mountparams = Gtk.Entry()
+        self.Tabs.tab2.pack_start(Gtk.Label(label="Params to pass to the mount command"), True, True, 0)
+        self.Tabs.tab2.pack_start(self.Widgets.mountparams, True, True, 0)
         self.Widgets.setmountform.connect("clicked", self.mntform)
         self.Tabs.tab2.pack_start(self.Widgets.setmountform, True, True, 0)
-        self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
 
         self.Tabs.tab0 = Gtk.Box()
         self.serverData = self._getServers(self)
@@ -72,7 +74,7 @@ class MyWindow(Gtk.Window):
 
         self.Tabs.tab0.pack_start(self.Widgets.ServerListView, True, True, 5)
         self.notebook.append_page(self.Tabs.tab0, Gtk.Label(label="Main"))
-
+        self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
         self.about = Gtk.Button(label="About")
         self.about.connect("clicked", self.about_box)
         self.box.pack_start(self.about, True, True, 10)
