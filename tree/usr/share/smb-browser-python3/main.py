@@ -33,6 +33,7 @@ class MyWindow(Gtk.Window):
         )
         dialog.format_secondary_text(
             "This program is only for browsing shares on other computers. If you would like to share files on your computer simply open Thunar, right-click on the directory you want to share and select the option 'Share'. If you want to manage your Shared configurations or set advanced options run 'Samba Admin', you can find it in your menu."
+            "\tYour computer will scan for shares when you press OK. SMB-Browser might freeze for a few seconds."
         )
         dialog.run()
 
@@ -57,6 +58,21 @@ class MyWindow(Gtk.Window):
         self.Tabs.tab2.pack_start(self.Widgets.setmountform, True, True, 0)
         self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
 
+        self.Tabs.tab0 = Gtk.Box()
+        self.serverData = self._getServers(self)
+        self.Widgets.ServerListBox = Gtk.TreeStore(str)
+        for i in self.serverData:
+            ip, hostname = i
+            self.Widgets.ServerListBox.append(None, [f"{ip} ({hostname})"])
+        self.Widgets.ServerListView = Gtk.TreeView(model=self.Widgets.ServerListBox)
+        self.renderer = Gtk.CellRendererText()
+        self.column = Gtk.TreeViewColumn(cell_renderer=self.renderer, text=0, weight=1)
+        self.Widgets.ServerListView.append_column(self.column)
+        self.Widgets.ServerListView.get_selection().connect("changed", self.showData)
+
+        self.Tabs.tab0.pack_start(self.Widgets.ServerListView, True, True, 5)
+        self.notebook.append_page(self.Tabs.tab0, Gtk.Label(label="Main"))
+
         self.about = Gtk.Button(label="About")
         self.about.connect("clicked", self.about_box)
         self.box.pack_start(self.about, True, True, 10)
@@ -64,9 +80,37 @@ class MyWindow(Gtk.Window):
         self.quit = Gtk.Button(label="Quit")
         self.quit.connect("clicked", self.destroyy)
         self.box.pack_end(self.quit, True, True, 0)
-        self.GetServerButon = Gtk.Button(label="DEBUG")
-        self.GetServerButon.connect("clicked",self._getServers)
-        self.box.pack_end(self.GetServerButon, True, True, 0)
+        #self.GetServerButon = Gtk.Button(label="DEBUG")
+        #self.GetServerButon.connect("clicked",self._getServers)
+        #self.box.pack_end(self.GetServerButon, True, True, 0)
+        self.getShareData("192.168.2.186")
+    def showData(self, sel):
+        model, treeiter = sel.get_selected()
+        if treeiter is None: return
+        sel = model[treeiter][0]
+        STRING = sel
+        sel = STRING.split(" ")[0], STRING.split(" ")[1].replace("(","").replace(")","")
+        self.ipChosen = sel[0]
+        return sel
+    def getShareData(self, host):
+        rawData = subprocess.run(f"smbclient -NL {host}", shell=True, capture_output=True).stdout.decode()
+        #print(rawData)
+        self.shares = list()
+        for i in rawData.split("\n"): #IM SO STUPID I FORGOT THE SPLIT AND WAS STUCK ON THIS FOR LIKE 10 MINUTES
+            if "Disk" not in i:
+                #print("continue")
+                continue
+            j = i.strip()
+            #print(j)
+            thing = list()
+            a = j.split(" ")
+            #print(a)
+            for k in a:
+                #print("k: "+k)
+                if k != "": thing.append(k)
+            print(thing)
+            self.shares.append((thing[0], thing[2:]))
+        print(self.shares)
     def destroyy(self, *args): self.destroy()
     def mntform(self, idkwhatthisvariableis):
         dialog = DialogExample(self)
@@ -108,6 +152,7 @@ class MyWindow(Gtk.Window):
             print(lne)
             servers.append((lne, subprocess.run(["nbtscan -e %s" % lne], shell=True, capture_output=True).stdout.decode().replace("\n","").split("\t")[1]))
         print(servers)
+        return servers
 
 
 win = MyWindow()
