@@ -33,7 +33,7 @@ class MyWindow(Gtk.Window):
         )
         dialog.format_secondary_text(
             "This program is only for browsing shares on other computers. If you would like to share files on your computer simply open Thunar, right-click on the directory you want to share and select the option 'Share'. If you want to manage your Shared configurations or set advanced options run 'Samba Admin', you can find it in your menu."
-            "\tYour computer will scan for shares when you press OK. SMB-Browser might freeze for a few seconds."
+            "\n\tYour computer will scan for shares when you press OK. SMB-Browser might freeze for a few seconds."
         )
         dialog.run()
 
@@ -59,7 +59,7 @@ class MyWindow(Gtk.Window):
         self.Tabs.tab2.pack_start(self.Widgets.mountparams, True, True, 0)
         self.Widgets.setmountform.connect("clicked", self.mntform)
         self.Tabs.tab2.pack_start(self.Widgets.setmountform, True, True, 0)
-
+#MAIN TAB
         self.Tabs.tab0 = Gtk.Box()
         self.serverData = self._getServers(self)
         self.Widgets.ServerListBox = Gtk.TreeStore(str)
@@ -71,21 +71,32 @@ class MyWindow(Gtk.Window):
         self.column = Gtk.TreeViewColumn(cell_renderer=self.renderer, text=0, weight=1)
         self.Widgets.ServerListView.append_column(self.column)
         self.Widgets.ServerListView.get_selection().connect("changed", self.showData)
-
+        self.Widgets.MountBtm = Gtk.Button(label="Mount")
+        self.Widgets.MountBtm.connect("clicked", self.mount)
         self.Tabs.tab0.pack_start(self.Widgets.ServerListView, True, True, 5)
         self.notebook.append_page(self.Tabs.tab0, Gtk.Label(label="Main"))
         self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
         self.about = Gtk.Button(label="About")
         self.about.connect("clicked", self.about_box)
+        socket = Gtk.Socket()
+        #self.box.add(socket)
+        self.sock_id = str(socket.get_id())
         self.box.pack_start(self.about, True, True, 10)
+        self.box.pack_start(socket, True, True, 10)
         self.box.pack_start(Gtk.Label(label="SMB-Browser Revamped by TheTechRobo"), True, True, 0)
         self.quit = Gtk.Button(label="Quit")
         self.quit.connect("clicked", self.destroyy)
         self.box.pack_end(self.quit, True, True, 0)
-        #self.GetServerButon = Gtk.Button(label="DEBUG")
-        #self.GetServerButon.connect("clicked",self._getServers)
-        #self.box.pack_end(self.GetServerButon, True, True, 0)
-        self.getShareData("192.168.2.186")
+        self.GetServerButon = Gtk.Button(label="DEBUG")
+        self.GetServerButon.connect("clicked",lambda z:self.mount("4355345345", "f", "/root"))
+        self.box.pack_end(self.GetServerButon, True, True, 0)
+        self.getShareData("192.168.2.248")
+    def mount(self, ip, share, point):
+        command = f"sudo mount -t cifs //{ip}/{share} {point}"
+        subprocess.Popen(
+                ["xterm", "-into", self.sock_id, "-geometry", "50x50",
+                    "-sb", "-e", "/bin/sh", "-c", command + " ; sleep 5"], shell=False
+                )
     def showData(self, sel):
         model, treeiter = sel.get_selected()
         if treeiter is None: return
