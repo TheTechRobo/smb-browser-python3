@@ -1,11 +1,11 @@
 [Desktop Entry]
-Version=1.2.1
+Version=1.0.0
 Type=Application
-Name=Download YouTube videos
-Comment=Minimal stdeb example
+Name=Network Share Browser
+Comment=Samba Share Browser
 # myscript should wait for user input at the end, else the terminal
 # window will disappear immediately.
-Exec=youtube-dl-gui
+Exec=smb-browser
 #Icon=/usr/share/icons/gnome/48x48/apps/file-manager.png
 Categories=Utility;
 # desktop should run this in a terminal application
