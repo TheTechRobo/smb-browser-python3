@@ -78,25 +78,34 @@ class MyWindow(Gtk.Window):
         self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
         self.about = Gtk.Button(label="About")
         self.about.connect("clicked", self.about_box)
-        socket = Gtk.Socket()
-        #self.box.add(socket)
-        self.sock_id = str(socket.get_id())
         self.box.pack_start(self.about, True, True, 10)
-        self.box.pack_start(socket, True, True, 10)
         self.box.pack_start(Gtk.Label(label="SMB-Browser Revamped by TheTechRobo"), True, True, 0)
         self.quit = Gtk.Button(label="Quit")
         self.quit.connect("clicked", self.destroyy)
         self.box.pack_end(self.quit, True, True, 0)
         self.GetServerButon = Gtk.Button(label="DEBUG")
-        self.GetServerButon.connect("clicked",lambda z:self.mount("4355345345", "f", "/root"))
+        self.GetServerButon.connect("clicked",self.mount)
         self.box.pack_end(self.GetServerButon, True, True, 0)
         self.getShareData("192.168.2.248")
-    def mount(self, ip, share, point):
-        command = f"sudo mount -t cifs //{ip}/{share} {point}"
-        subprocess.Popen(
-                ["xterm", "-into", self.sock_id, "-geometry", "50x50",
-                    "-sb", "-e", "/bin/sh", "-c", command + " ; sleep 5"], shell=False
-                )
+    def selfol(self, s):
+        dialog = Gtk.FileChooserDialog(
+            title="Please choose a folder",
+            parent=self,
+            action=Gtk.FileChooserAction.SELECT_FOLDER,
+        )
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK
+        )
+        dialog.set_default_size(800, 400)
+        fiel = dialog.run()
+        if fiel == Gtk.ResponseType.OK:
+            self.fn = dialog.get_filename()
+        else:
+            print("Cancel")
+        dialog.destroy()
+    def mount(self, s):
+        command = ["xterm", "-e", f"sudo mount -t cifs //i{self.ipChosen}/{self.share} && python -c 'input(\"Press ENTER to continue\")'"]
+        subprocess.run(command)
     def showData(self, sel):
         model, treeiter = sel.get_selected()
         if treeiter is None: return
@@ -104,6 +113,7 @@ class MyWindow(Gtk.Window):
         STRING = sel
         sel = STRING.split(" ")[0], STRING.split(" ")[1].replace("(","").replace(")","")
         self.ipChosen = sel[0]
+        print(self.ipChosen)
         return sel
     def getShareData(self, host):
         rawData = subprocess.run(f"smbclient -NL {host}", shell=True, capture_output=True).stdout.decode()
