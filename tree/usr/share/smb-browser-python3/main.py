@@ -61,10 +61,10 @@ class MyWindow(Gtk.Window):
         self.Tabs.tab2.pack_start(self.Widgets.setmountform, True, True, 0)
 #MAIN TAB
         self.Tabs.tab0 = Gtk.Box()
+
         self.serverData = self._getServers(self)
         self.Widgets.ServerListBox = Gtk.TreeStore(str)
-        for i in self.serverData:
-            ip, hostname = i
+        for ip, hostname in self.serverData:
             self.Widgets.ServerListBox.append(None, [f"{ip} ({hostname})"])
         self.Widgets.ServerListView = Gtk.TreeView(model=self.Widgets.ServerListBox)
         self.renderer = Gtk.CellRendererText()
@@ -73,7 +73,16 @@ class MyWindow(Gtk.Window):
         self.Widgets.ServerListView.get_selection().connect("changed", self.showData)
         self.Widgets.MountBtm = Gtk.Button(label="Mount")
         self.Widgets.MountBtm.connect("clicked", self.mount)
+
+        self.Widgets.ShareListBox = Gtk.TreeStore(str)
+        self.Widgets.ShareListView = Gtk.TreeView(model=self.Widgets.ShareListBox)
+
+        self.Widgets.ShareListView.set_rules_hint(True)
+        self.Widgets.ShareListView.set_reorderable(True)
+
         self.Tabs.tab0.pack_start(self.Widgets.ServerListView, True, True, 5)
+        self.Tabs.tab0.pack_start(self.Widgets.ShareListView, True, True, 5)
+
         self.notebook.append_page(self.Tabs.tab0, Gtk.Label(label="Main"))
         self.notebook.append_page(self.Tabs.tab2, Gtk.Label(label="Mount options"))
         self.about = Gtk.Button(label="About")
@@ -89,7 +98,7 @@ class MyWindow(Gtk.Window):
         self.getShareData("192.168.2.248")
     def selfol(self, s):
         dialog = Gtk.FileChooserDialog(
-            title="Please choose a folder",
+            title="Select a mount point",
             parent=self,
             action=Gtk.FileChooserAction.SELECT_FOLDER,
         )
@@ -104,6 +113,7 @@ class MyWindow(Gtk.Window):
             print("Cancel")
         dialog.destroy()
     def mount(self, s):
+        self.selfol(s)
         command = ["xterm", "-e", f"sudo mount -t cifs //i{self.ipChosen}/{self.share} && python -c 'input(\"Press ENTER to continue\")'"]
         subprocess.run(command)
     def showData(self, sel):
@@ -114,7 +124,23 @@ class MyWindow(Gtk.Window):
         sel = STRING.split(" ")[0], STRING.split(" ")[1].replace("(","").replace(")","")
         self.ipChosen = sel[0]
         print(self.ipChosen)
+        ddata = self.getShareData(self.ipChosen)
+        for i in ddata:
+            self.Widgets.ShareListBox.append
+            print(i)
+        self.otherrenderer = Gtk.CellRendererText()
+        self.columnn = Gtk.TreeViewColumn(cell_renderer=self.otherrenderer, text=0, weight=1)
+        self.Widgets.ShareListBox.clear()
+        self.Widgets.ShareListView.append_column(self.columnn)
+        self.Widgets.ShareListView.get_selection().connect("changed", self.changeShare)
+        self.Widgets.ShareListView.show()
         return sel
+    def changeShare(self, sel):
+        model, treeiter = sel.get_selected()
+        if treeiter is None: return
+        sel = model[treeiter][0]
+        STRING = sel
+        print(STRING)
     def getShareData(self, host):
         rawData = subprocess.run(f"smbclient -NL {host}", shell=True, capture_output=True).stdout.decode()
         #print(rawData)
@@ -134,6 +160,7 @@ class MyWindow(Gtk.Window):
             print(thing)
             self.shares.append((thing[0], thing[2:]))
         print(self.shares)
+        return self.shares
     def destroyy(self, *args): self.destroy()
     def mntform(self, idkwhatthisvariableis):
         dialog = DialogExample(self)
